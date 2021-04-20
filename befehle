@@ -1,0 +1,6 @@
+sbatch --mincpus 8 --gres=gpu:1 --partition=long -J "starGan_test" --wrap="python /home/schober/stargan-v2/main.py --mode train --num_domains 2 --total_iters 1000 --w_hpf 1 --lambda_reg 1 --lambda_sty 1 --lambda_ds 1 --lambda_cyc 1 --train_img_dir data/a2d2_carla/train --val_img_dir data/a2d2_carla/val --batch_size 4 --val_batch_size 16 --checkpoint_dir expr/checkpoints/a2d2_carla --sample_dir expr/samples/a2d2_carla --sample_every 100 --save_every 100 --eval_every 100"
+
+aktuelles Training
+sbatch --mincpus 8 --gres=gpu:1 --partition=long -J "starGan_test" --wrap="python /home/schober/stargan-v2/main.py --mode train --num_domains 2 --total_iters 1000 --w_hpf 0 --lambda_reg 1 --lambda_sty 1 --lambda_ds 1 --lambda_cyc 1 --train_img_dir data/a2d2_carla/train --val_img_dir data/a2d2_carla/val --batch_size 4 --val_batch_size 16 --checkpoint_dir expr/checkpoints/a2d2_carla --sample_dir expr/samples/a2d2_carla --sample_every 1000 --save_every 1000"
+
+sbatch --mincpus 8 --gres=gpu:1 --partition=long -J "starGan_test" --wrap="python /home/schober/stargan-v2/main.py --mode sample --num_domains 2 --resume_iter 1000 --w_hpf 0 --checkpoint_dir expr/checkpoints/a2d2_carla --result_dir expr/results/a2d2_carla --src_dir data/a2d2_carla/src --ref_dir data/a2d2_carla/ref"
