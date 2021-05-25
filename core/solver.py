@@ -188,6 +188,30 @@ class Solver(nn.Module):
         print('Working on {}...'.format(fname))
         utils.video_ref(nets_ema, args, src.x, ref.x, ref.y, fname)
 
+    def sample_latent(self, loaders):
+        args = self.args
+        nets_ema = self.nets_ema
+        self._load_checkpoint(args.resume_iter)
+
+        fetcher_latent = InputFetcher(loaders.src, None, args.latent_dim, 'val')
+        inputs_latent = next(fetcher_latent)
+
+        iteration = args.resume_iter
+        os.makedirs(args.sample_dir, exist_ok=True)
+        utils.debug_image(nets_ema, args, inputs=inputs_latent, step=iteration)
+
+    def sample_source(self, loaders):
+        args = self.args
+        nets_ema = self.nets_ema
+        self._load_checkpoint(args.resume_iter)
+
+        src = next(InputFetcher(loaders.src, None, args.latent_dim, 'test'))
+
+
+        iteration = args.resume_iter
+        os.makedirs(args.sample_dir, exist_ok = True)
+        utils.translate_single(nets_ema, args, src.x, step=iteration)
+
     @torch.no_grad()
     def evaluate(self):
         args = self.args

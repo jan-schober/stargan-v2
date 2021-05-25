@@ -71,6 +71,25 @@ def main(args):
                                             shuffle=False,
                                             num_workers=args.num_workers))
         solver.sample(loaders)
+
+    elif args.mode == 'sample_latent':
+        assert len(subdirs(args.src_dir)) == args.num_domains
+        assert len(subdirs(args.ref_dir)) == args.num_domains
+        loaders = Munch(src=get_test_loader(root=args.src_dir,
+                                            img_size=args.img_size,
+                                            batch_size=args.val_batch_size,
+                                            shuffle=False,
+                                            num_workers=args.num_workers))
+        solver.sample_latent(loaders)
+
+    elif args.mode == 'sample_source':
+        loaders = Munch(src=get_test_loader(root=args.src_dir,
+                                            img_size=args.img_size,
+                                            batch_size=args.val_batch_size,
+                                            shuffle=False,
+                                            num_workers=args.num_workers))
+        solver.sample_source(loaders)
+
     elif args.mode == 'eval':
         solver.evaluate()
     elif args.mode == 'align':
@@ -135,7 +154,7 @@ if __name__ == '__main__':
 
     # misc
     parser.add_argument('--mode', type=str, required=True,
-                        choices=['train', 'sample', 'eval', 'align'],
+                        choices=['train', 'sample', 'eval', 'align', 'sample_latent', 'sample_source'],
                         help='This argument is used in solver')
     parser.add_argument('--num_workers', type=int, default=4,
                         help='Number of workers used in DataLoader')
@@ -177,6 +196,7 @@ if __name__ == '__main__':
     parser.add_argument('--sample_every', type=int, default=5000)
     parser.add_argument('--save_every', type=int, default=10000)
     parser.add_argument('--eval_every', type=int, default=50000)
+
 
     args = parser.parse_args()
     main(args)

@@ -1,3 +1,5 @@
+import sys
+
 from PIL import Image
 import glob
 import random
@@ -6,30 +8,37 @@ import shutil
 
 
 def get_name(path):
-    name_with_ending = path.split('/')[-1]
-    return name_with_ending
+    name_with_ending = path.split('/')[-2:]
+    name = name_with_ending[0] + '_' + name_with_ending[1]
+    return name
 
 
 '''
-root_path = '/storage/carla_daten4/'
-img_list = sorted(glob.glob(root_path + '*png'))
+root_path = '/home/schober/carla/output/'
+img_list = sorted(glob.glob(root_path + 'Town01_400/*png'))
 
 print(img_list[0:10])
 print(get_name(img_list[0]))
 
 #img_list = img_list[0:10]
 
-for img in img_list[::2]:
+print(get_name(img_list[0]))
+max_i = len(img_list)
+i = 0
+for img in img_list:
+    i +=1
+    print(str(i) + ' / '+ str(max_i))
     im_op = Image.open(img)
     im_op_1 = im_op.resize((256, 256))
     out_name = get_name(img)
     im_op_1.save('/home/schober/stargan-v2/data/a2d2_carla/train/carla/' + out_name)
 
+'''
 # a2d2 images
 
 path = '/storage/Audi/camera_lidar_semantic_bboxes/20180807_145028/camera/cam_front_center/20180807145028_camera_frontcenter_000000091.png'
-root_path = '/storage/Audi/camera_lidar_semantic_bboxes/'
-img_list = glob.glob(root_path + '*/camera/cam_front_center/*.png')
+root_path = '/storage/Audi/camera_lidar_test/20180810_150607/'
+img_list = glob.glob(root_path + '/camera/cam_front_center/*.png')
 
 
 
@@ -39,16 +48,18 @@ img_list = glob.glob(root_path + '*/camera/cam_front_center/*.png')
 img_name = get_name(path)
 print(img_name)
 print(len(img_list))
-
+max_i = len(img_list)
+i = 0
 for img in img_list:
+    i += 1
+    print(str(i) + ' / '+ str(max_i))
     im_op = Image.open(img)
     im_op_1 = im_op.resize((256, 256))
     out_name = get_name(img)
     im_op_1.save('/home/schober/stargan-v2/data/a2d2_carla/train/a2d2/' + out_name)
 
+
 '''
-
-
 def get_percentage_list(file_list, number_images):
     out_list  = random.sample(file_list, number_images)
     return out_list
@@ -81,3 +92,5 @@ move_file(val_list_a2d2, out_a2d2)
 move_file(val_list_carla, out_carla)
 
 print(val_list_carla[0])
+
+'''

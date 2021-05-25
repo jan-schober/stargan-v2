@@ -99,6 +99,39 @@ def translate_using_latent(nets, args, x_src, y_trg_list, z_trg_list, psi, filen
 
 
 @torch.no_grad()
+def translate_single(nets, args, x_src, step):
+
+    device = x_src.device
+    N, C, H, W = x_src.size()
+
+    z_trg_list = torch.randn(args.num_outs_per_domain, 1, args.latent_dim).repeat(1, N, 1).to(device)
+    latent_dim = z_trg_list[0].size(1)
+
+    masks = nets.fan.get_heatmap(x_src) if args.w_hpf > 0 else None
+    psi = 0.7
+
+    # latent-guided image synthesis
+    y_trg_list = [torch.tensor(y).repeat(N).to(device)
+                  for y in range(min(args.num_domains, 5))]
+
+    for i, x_only in enumerate(x_src):
+        for t, (y_trg, z_trg) in enumerate(zip(y_trg_list, z_trg_list)):
+            z_many = torch.randn(10000, latent_dim).to(x_only.device)
+            y_many = torch.LongTensor(10000).to(x_only.device).fill_(y_trg[0])
+            s_many = nets.mapping_network(z_many, y_many)
+            s_avg = torch.mean(s_many, dim=0, keepdim=True)
+            s_avg = s_avg.repeat(N, 1)
+            s_trg = nets.mapping_network(z_trg, y_trg)
+            s_trg = torch.lerp(s_avg, s_trg, psi)
+            x_fake = nets.generator(x_only.unsqueeze(0), s_trg[0].unsqueeze(0), masks = masks)
+            if t == 0:
+                filename = ospj(args.sample_dir, '%06d_output_%01d.jpg' % (step, i))
+                save_image(x_fake, 1, filename)
+
+
+
+
+@torch.no_grad()
 def translate_using_reference(nets, args, x_src, x_ref, y_ref, filename):
     N, C, H, W = x_src.size()
     wb = torch.ones(1, C, H, W).to(x_src.device)
@@ -116,7 +149,6 @@ def translate_using_reference(nets, args, x_src, x_ref, y_ref, filename):
     x_concat = torch.cat(x_concat, dim=0)
     save_image(x_concat, N+1, filename)
     del x_concat
-
 
 @torch.no_grad()
 def debug_image(nets, args, inputs, step):
